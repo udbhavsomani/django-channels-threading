@@ -1,0 +1,9 @@
+FROM python:3.10
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+WORKDIR /app
+
+COPY ./req.txt ./
+RUN pip install -r ./req.txt
+COPY ./ ./

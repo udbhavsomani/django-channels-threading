@@ -1,0 +1,23 @@
+version: '3'
+services:
+  redis:
+    image: redis
+  web:
+    build: .
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate --noinput &&
+             python manage.py createsuperuser --noinput"
+    environment:
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@admin.com
+  web_run:
+    restart: always
+    extends:
+      service: web
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"

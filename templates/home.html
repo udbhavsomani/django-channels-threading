@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Student data</title>
+</head>
+
+<body>
+    <div class="container mt-5 pt-5">
+        <h4>Percent completed : <span id="complete"></span></h4>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="25" aria-valuemin="0"
+                aria-valuemax="100"></div>
+        </div>
+    </div>
+    <table class="table table-hover mt-5 pt-5">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Age</th>
+                <th scope="col">Address</th>
+            </tr>
+        </thead>
+        <tbody id="table-data">
+        </tbody>
+    </table>
+
+    <script>
+        var url = `ws://${window.location.host}/ws/`
+
+        var socket = new WebSocket(url);
+
+        socket.onopen = function (e) {
+            console.log('Socket Connected');
+        }
+
+        socket.onmessage = function (e) {
+            var data = JSON.parse(e.data);
+            // console.log(data);
+            if (data.payload) {
+                addData(data.payload);
+                progress(data.payload.total, data.payload.current_total);
+            }
+        }
+
+        socket.onclose = function (e) {
+            console.log('Socket Disconnected');
+        }
+
+        function addData(data) {
+            var html = `
+            <tr>
+                <th scope="row">${data.current_total}</th>
+                <td>${data.name}</td>
+                <td>${data.email}</td>
+                <td>${data.age}</td>
+                <td>${data.address}</td>
+            </tr>
+            `
+            document.getElementById('table-data').innerHTML += html;
+            console.log(html);
+        }
+
+        function progress(total, current_total) {
+            var progress = document.querySelector('.progress-bar');
+            var percent = parseInt((current_total / total) * 100);
+
+            document.getElementById('complete').innerHTML = `${percent}%`;
+
+            progress.style.width = `${percent}%`;
+        }
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
